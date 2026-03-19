@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 
+# таблица случайных индексов Саати
+RI_TABLE = {1: 0, 2: 0, 3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24, 7: 1.32, 8: 1.41, 9: 1.45}
+
 def get_weights(matrix):
     # аычисляет вектор приоритетов
     n = len(matrix)
@@ -8,6 +11,18 @@ def get_weights(matrix):
     row_means = np.sum(matrix, axis=1) / n
     # чтобы сумма весов была равна 1.0
     weights = row_means / np.sum(row_means)
+    # расчет CI и CR (для проверки логики Саати)
+    # находим Lambda Max
+    #dot (произведение матрицы на вектор весов) 
+    #mean вычисляет среднее арифметическое элементов массива
+    weighted_sum = np.dot(matrix, weights)
+    lambda_max = np.mean(weighted_sum / weights)
+
+    # индекс согласованности
+    ci = (lambda_max - n) / (n - 1) if n > 1 else 0
+    # отношение согласованности
+    ri = RI_TABLE.get(n, 1.45)
+    cr = ci / ri if ri > 0 else 0
     return weights
 
 # структуоа
